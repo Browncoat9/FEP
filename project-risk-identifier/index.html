@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Risk Identifier | Fuzzy Elf Productions</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    .tool-wrapper {
+      max-width: 860px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+    }
+
+    .tool-card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      margin-bottom: 2rem;
+    }
+
+    .tool-card h2 {
+      font-size: 1.2rem;
+      color: var(--navy);
+      margin-bottom: 0.5rem;
+    }
+
+    .tool-card p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 1.2rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      padding: 0.9rem 1rem;
+      border: 1.5px solid #d0d7de;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--text);
+      resize: vertical;
+      transition: border-color 0.2s;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: background 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary:hover {
+      background: #1a6fa0;
+    }
+
+    .btn-primary:disabled {
+      background: #aec6d8;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--accent);
+      border: 1.5px solid var(--accent);
+      padding: 0.5rem 1.2rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading .spinner { display: block; }
+    .loading .btn-text { display: none; }
+
+    #results { display: none; }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .results-header h2 {
+      font-size: 1.2rem;
+      color: var(--navy);
+    }
+
+    .risk-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .risk-table th {
+      background: var(--navy);
+      color: white;
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .risk-table th:first-child { border-radius: 6px 0 0 0; }
+    .risk-table th:last-child  { border-radius: 0 6px 0 0; }
+
+    .risk-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #e8ecf0;
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    .risk-table tr:last-child td { border-bottom: none; }
+    .risk-table tr:nth-child(even) td { background: #f8fafc; }
+
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .High   { background: #fde8e8; color: #c0392b; }
+    .Medium { background: #fef3cd; color: #946c00; }
+    .Low    { background: #d5f5e3; color: #1e7e45; }
+
+    .category-badge {
+      background: #dce8f5;
+      color: var(--blue);
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .error-msg {
+      background: #fde8e8;
+      color: #c0392b;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      display: none;
+    }
+
+    @media (max-width: 600px) {
+      .risk-table { font-size: 0.8rem; }
+      .risk-table th, .risk-table td { padding: 0.5rem 0.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="logo" href="../index.html">Fuzzy Elf <span>Productions</span></a>
+    <nav>
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#about">About</a>
+    </nav>
+  </header>
+
+  <div class="project-hero">
+    <a class="back" href="../index.html">← Back to all projects</a>
+    <h1>⚠️ Project Risk Identifier</h1>
+    <p>Describe your project and get an AI-generated risk register in seconds.</p>
+  </div>
+
+  <div class="tool-wrapper">
+
+    <div class="tool-card">
+      <h2>Describe your project</h2>
+      <p>Include the goal, team size, timeline, key dependencies, or anything else relevant. The more detail you provide, the more targeted the risks will be.</p>
+      <textarea id="description" placeholder="e.g. We're launching a new customer portal in Q3. The project involves migrating 50,000 customer records from a legacy system, integrating with three third-party APIs, and training a team of 12 support staff. The deadline is fixed due to a regulatory requirement..."></textarea>
+      <button class="btn-primary" id="generateBtn" onclick="generateRisks()">
+        <div class="spinner" id="spinner"></div>
+        <span class="btn-text">Generate Risk Register</span>
+      </button>
+    </div>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <div id="results">
+      <div class="tool-card">
+        <div class="results-header">
+          <h2>Risk Register</h2>
+          <button class="btn-secondary" onclick="downloadCSV()">Download CSV</button>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="risk-table" id="riskTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Risk</th>
+                <th>Category</th>
+                <th>Likelihood</th>
+                <th>Impact</th>
+                <th>Mitigation</th>
+              </tr>
+            </thead>
+            <tbody id="riskBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    &copy; 2026 Fuzzy Elf Productions &mdash; fuzzyelfproductions.com
+  </footer>
+
+  <script>
+    let currentRisks = [];
+
+    async function generateRisks() {
+      const description = document.getElementById('description').value.trim();
+      const btn = document.getElementById('generateBtn');
+      const errorMsg = document.getElementById('errorMsg');
+      const results = document.getElementById('results');
+
+      if (description.length < 10) {
+        showError('Please enter a project description before generating.');
+        return;
+      }
+
+      // Reset UI
+      errorMsg.style.display = 'none';
+      results.style.display = 'none';
+      btn.disabled = true;
+      btn.classList.add('loading');
+
+      try {
+        const response = await fetch('/api/risk', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ description }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Something went wrong.');
+        }
+
+        currentRisks = data.risks;
+        renderTable(data.risks);
+        results.style.display = 'block';
+        results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      } catch (err) {
+        showError(err.message || 'Unable to generate risks. Please try again.');
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+      }
+    }
+
+    function renderTable(risks) {
+      const tbody = document.getElementById('riskBody');
+      tbody.innerHTML = risks.map(r => `
+        <tr>
+          <td><strong>${r.id}</strong></td>
+          <td>${r.risk}</td>
+          <td><span class="category-badge">${r.category}</span></td>
+          <td><span class="badge ${r.likelihood}">${r.likelihood}</span></td>
+          <td><span class="badge ${r.impact}">${r.impact}</span></td>
+          <td>${r.mitigation}</td>
+        </tr>
+      `).join('');
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('errorMsg');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function downloadCSV() {
+      if (!currentRisks.length) return;
+      const headers = ['ID', 'Risk', 'Category', 'Likelihood', 'Impact', 'Mitigation'];
+      const rows = currentRisks.map(r =>
+        [r.id, r.risk, r.category, r.likelihood, r.impact, r.mitigation]
+          .map(v => `"${String(v).replace(/"/g, '""')}"`)
+          .join(',')
+      );
+      const csv = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'risk-register.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Allow Ctrl+Enter to submit
+    document.getElementById('description').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) generateRisks();
+    });
+  </script>
+
+</body>
+</html>
