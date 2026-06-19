@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Project Risk Identifier | Fuzzy Elf Productions</title>
+  <title>Project Risk Identifier — Matt Brown</title>
   <link rel="stylesheet" href="../style.css" />
   <style>
     .tool-wrapper {
@@ -13,22 +13,23 @@
     }
 
     .tool-card {
-      background: white;
+      background: var(--card);
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 2rem;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
       margin-bottom: 2rem;
     }
 
     .tool-card h2 {
-      font-size: 1.2rem;
-      color: var(--navy);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--white);
       margin-bottom: 0.5rem;
     }
 
     .tool-card p {
       color: var(--muted);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       margin-bottom: 1.2rem;
     }
 
@@ -36,7 +37,8 @@
       width: 100%;
       min-height: 140px;
       padding: 0.9rem 1rem;
-      border: 1.5px solid #d0d7de;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 8px;
       font-size: 0.95rem;
       font-family: inherit;
@@ -45,6 +47,8 @@
       transition: border-color 0.2s;
     }
 
+    textarea::placeholder { color: var(--muted); }
+
     textarea:focus {
       outline: none;
       border-color: var(--accent);
@@ -52,59 +56,51 @@
 
     .btn-primary {
       background: var(--accent);
-      color: white;
+      color: var(--bg);
       border: none;
       padding: 0.75rem 2rem;
-      border-radius: 6px;
-      font-size: 1rem;
-      font-weight: 600;
+      border-radius: 7px;
+      font-size: 0.95rem;
+      font-weight: 700;
       cursor: pointer;
       margin-top: 1rem;
-      transition: background 0.2s;
+      transition: opacity 0.2s, transform 0.2s;
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
     }
 
-    .btn-primary:hover {
-      background: #1a6fa0;
-    }
-
-    .btn-primary:disabled {
-      background: #aec6d8;
-      cursor: not-allowed;
-    }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
     .btn-secondary {
-      background: white;
+      background: transparent;
       color: var(--accent);
-      border: 1.5px solid var(--accent);
-      padding: 0.5rem 1.2rem;
+      border: 1px solid var(--accent);
+      padding: 0.45rem 1.1rem;
       border-radius: 6px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: background 0.2s, color 0.2s;
     }
 
     .btn-secondary:hover {
       background: var(--accent);
-      color: white;
+      color: var(--bg);
     }
 
     .spinner {
-      width: 18px;
-      height: 18px;
-      border: 2px solid rgba(255,255,255,0.4);
-      border-top-color: white;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(13,13,20,0.4);
+      border-top-color: var(--bg);
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
       display: none;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     .loading .spinner { display: block; }
     .loading .btn-text { display: none; }
@@ -115,69 +111,75 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
+      margin-bottom: 1.25rem;
     }
 
     .results-header h2 {
-      font-size: 1.2rem;
-      color: var(--navy);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--white);
     }
 
     .risk-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.9rem;
+      font-size: 0.875rem;
     }
 
     .risk-table th {
-      background: var(--navy);
-      color: white;
-      padding: 0.75rem 1rem;
+      background: var(--surface);
+      color: var(--muted);
+      padding: 0.65rem 1rem;
       text-align: left;
       font-weight: 600;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
     }
 
-    .risk-table th:first-child { border-radius: 6px 0 0 0; }
-    .risk-table th:last-child  { border-radius: 0 6px 0 0; }
-
     .risk-table td {
-      padding: 0.75rem 1rem;
-      border-bottom: 1px solid #e8ecf0;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border);
       vertical-align: top;
-      line-height: 1.5;
+      line-height: 1.55;
+      color: var(--text);
     }
 
     .risk-table tr:last-child td { border-bottom: none; }
-    .risk-table tr:nth-child(even) td { background: #f8fafc; }
+    .risk-table tr:hover td { background: rgba(255,255,255,0.02); }
 
     .badge {
       display: inline-block;
       padding: 0.2rem 0.6rem;
-      border-radius: 12px;
-      font-size: 0.78rem;
+      border-radius: 5px;
+      font-size: 0.75rem;
       font-weight: 700;
     }
 
-    .High   { background: #fde8e8; color: #c0392b; }
-    .Medium { background: #fef3cd; color: #946c00; }
-    .Low    { background: #d5f5e3; color: #1e7e45; }
+    .High   { background: rgba(239,68,68,0.15);  color: #f87171; }
+    .Medium { background: rgba(234,179,8,0.15);  color: #fbbf24; }
+    .Low    { background: rgba(34,197,94,0.15);  color: #4ade80; }
 
     .category-badge {
-      background: #dce8f5;
-      color: var(--blue);
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(6,182,212,0.2);
       display: inline-block;
       padding: 0.2rem 0.6rem;
-      border-radius: 12px;
-      font-size: 0.78rem;
+      border-radius: 5px;
+      font-size: 0.75rem;
       font-weight: 600;
     }
 
     .error-msg {
-      background: #fde8e8;
-      color: #c0392b;
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #f87171;
       padding: 1rem;
       border-radius: 8px;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
       display: none;
     }
 
@@ -190,7 +192,7 @@
 <body>
 
   <header>
-    <a class="logo" href="../index.html">Fuzzy Elf <span>Productions</span></a>
+    <a class="logo" href="../index.html">Matt <span>Brown</span></a>
     <nav>
       <a href="../index.html#projects">Projects</a>
       <a href="../index.html#about">About</a>
@@ -198,7 +200,7 @@
   </header>
 
   <div class="project-hero">
-    <a class="back" href="../index.html">← Back to all projects</a>
+    <a class="back" href="../index.html">← Back to projects</a>
     <h1>⚠️ Project Risk Identifier</h1>
     <p>Describe your project and get an AI-generated risk register in seconds.</p>
   </div>
@@ -207,7 +209,7 @@
 
     <div class="tool-card">
       <h2>Describe your project</h2>
-      <p>Include the goal, team size, timeline, key dependencies, or anything else relevant. The more detail you provide, the more targeted the risks will be.</p>
+      <p>Include the goal, team size, timeline, key dependencies, or anything else relevant. The more context you give, the more targeted the risks will be.</p>
       <textarea id="description" placeholder="e.g. We're launching a new customer portal in Q3. The project involves migrating 50,000 customer records from a legacy system, integrating with three third-party APIs, and training a team of 12 support staff. The deadline is fixed due to a regulatory requirement..."></textarea>
       <button class="btn-primary" id="generateBtn" onclick="generateRisks()">
         <div class="spinner" id="spinner"></div>
@@ -244,7 +246,7 @@
   </div>
 
   <footer>
-    &copy; 2026 Fuzzy Elf Productions &mdash; fuzzyelfproductions.com
+    &copy; 2026 Matt Brown &mdash; <a href="../index.html">fuzzyelfproductions.com</a>
   </footer>
 
   <script>
@@ -261,7 +263,6 @@
         return;
       }
 
-      // Reset UI
       errorMsg.style.display = 'none';
       results.style.display = 'none';
       btn.disabled = true;
@@ -297,7 +298,7 @@
       const tbody = document.getElementById('riskBody');
       tbody.innerHTML = risks.map(r => `
         <tr>
-          <td><strong>${r.id}</strong></td>
+          <td><strong style="color:var(--white)">${r.id}</strong></td>
           <td>${r.risk}</td>
           <td><span class="category-badge">${r.category}</span></td>
           <td><span class="badge ${r.likelihood}">${r.likelihood}</span></td>
@@ -331,7 +332,6 @@
       URL.revokeObjectURL(url);
     }
 
-    // Allow Ctrl+Enter to submit
     document.getElementById('description').addEventListener('keydown', e => {
       if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) generateRisks();
     });
