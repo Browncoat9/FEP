@@ -210,7 +210,8 @@
     <div class="tool-card">
       <h2>Describe your project</h2>
       <p>Include the goal, team size, timeline, key dependencies, or anything else relevant. The more context you give, the more targeted the risks will be.</p>
-      <textarea id="description" placeholder="e.g. We're launching a new customer portal in Q3. The project involves migrating 50,000 customer records from a legacy system, integrating with three third-party APIs, and training a team of 12 support staff. The deadline is fixed due to a regulatory requirement..."></textarea>
+      <textarea id="description" maxlength="2000" placeholder="e.g. We're launching a new customer portal in Q3. The project involves migrating 50,000 customer records from a legacy system, integrating with three third-party APIs, and training a team of 12 support staff. The deadline is fixed due to a regulatory requirement..."></textarea>
+      <div id="charCount" style="text-align:right; font-size:0.8rem; color:var(--muted); margin-top:0.4rem;">0 / 2000</div>
       <button class="btn-primary" id="generateBtn" onclick="generateRisks()">
         <div class="spinner" id="spinner"></div>
         <span class="btn-text">Generate Risk Register</span>
@@ -294,16 +295,28 @@
       }
     }
 
+    // Escape HTML to prevent XSS from AI-generated content
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = String(str);
+      return div.innerHTML;
+    }
+
+    // Only allow known badge classes to prevent class injection
+    function safeBadgeClass(val) {
+      return ['High', 'Medium', 'Low'].includes(val) ? val : 'Low';
+    }
+
     function renderTable(risks) {
       const tbody = document.getElementById('riskBody');
       tbody.innerHTML = risks.map(r => `
         <tr>
-          <td><strong style="color:var(--white)">${r.id}</strong></td>
-          <td>${r.risk}</td>
-          <td><span class="category-badge">${r.category}</span></td>
-          <td><span class="badge ${r.likelihood}">${r.likelihood}</span></td>
-          <td><span class="badge ${r.impact}">${r.impact}</span></td>
-          <td>${r.mitigation}</td>
+          <td><strong style="color:var(--white)">${escapeHtml(r.id)}</strong></td>
+          <td>${escapeHtml(r.risk)}</td>
+          <td><span class="category-badge">${escapeHtml(r.category)}</span></td>
+          <td><span class="badge ${safeBadgeClass(r.likelihood)}">${escapeHtml(r.likelihood)}</span></td>
+          <td><span class="badge ${safeBadgeClass(r.impact)}">${escapeHtml(r.impact)}</span></td>
+          <td>${escapeHtml(r.mitigation)}</td>
         </tr>
       `).join('');
     }
@@ -332,7 +345,16 @@
       URL.revokeObjectURL(url);
     }
 
-    document.getElementById('description').addEventListener('keydown', e => {
+    const textarea = document.getElementById('description');
+    const charCount = document.getElementById('charCount');
+
+    textarea.addEventListener('input', () => {
+      const len = textarea.value.length;
+      charCount.textContent = `${len} / 2000`;
+      charCount.style.color = len > 1800 ? '#f87171' : 'var(--muted)';
+    });
+
+    textarea.addEventListener('keydown', e => {
       if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) generateRisks();
     });
   </script>
