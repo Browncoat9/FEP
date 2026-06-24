@@ -1,1 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Password Required — Matt Brown</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    body {
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
 
+    .login-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 380px;
+      margin: 2rem;
+    }
+
+    .lock-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      display: block;
+      text-align: center;
+    }
+
+    .login-box h1 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--white);
+      text-align: center;
+      margin-bottom: 0.4rem;
+    }
+
+    .login-box p {
+      color: var(--muted);
+      font-size: 0.875rem;
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+
+    .input-wrap {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    input[type="password"] {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: inherit;
+      color: var(--text);
+      transition: border-color 0.2s;
+    }
+
+    input[type="password"]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    input[type="password"]::placeholder {
+      color: var(--muted);
+    }
+
+    .btn-login {
+      width: 100%;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 0.8rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      font-family: inherit;
+    }
+
+    .btn-login:hover { opacity: 0.88; }
+    .btn-login:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .error-msg {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #f87171;
+      padding: 0.7rem 1rem;
+      border-radius: 7px;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      display: none;
+      text-align: center;
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 1.25rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <div class="login-box">
+    <span class="lock-icon">🔒</span>
+    <h1>Password required</h1>
+    <p>This project is private. Enter the password to continue.</p>
+
+    <div class="error-msg" id="errorMsg">Incorrect password. Try again.</div>
+
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="input-wrap">
+        <input type="password" id="passwordInput" placeholder="Enter password" autocomplete="current-password" required />
+      </div>
+      <button type="submit" class="btn-login" id="loginBtn">Continue →</button>
+    </form>
+
+    <a class="back-link" href="/">← Back to home</a>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const project = params.get('project') || '';
+    const redirect = params.get('redirect') || '/';
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const password = document.getElementById('passwordInput').value;
+      const btn = document.getElementById('loginBtn');
+      const errorMsg = document.getElementById('errorMsg');
+
+      errorMsg.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = 'Checking...';
+
+      try {
+        const res = await fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ project, password }),
+        });
+
+        if (res.ok) {
+          window.location.href = redirect;
+        } else {
+          const data = await res.json();
+          errorMsg.textContent = data.error || 'Incorrect password. Try again.';
+          errorMsg.style.display = 'block';
+          document.getElementById('passwordInput').value = '';
+          document.getElementById('passwordInput').focus();
+        }
+      } catch (err) {
+        errorMsg.textContent = 'Something went wrong. Please try again.';
+        errorMsg.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Continue →';
+      }
+    }
+  </script>
+
+</body>
+</html>
