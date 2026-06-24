@@ -189,7 +189,22 @@
     }
   </style>
 </head>
-<body>
+<body style="display:none">
+  <script>
+    (async function() {
+      try {
+        const res = await fetch('/api/auth?project=risk-identifier');
+        const { authenticated } = await res.json();
+        if (!authenticated) {
+          window.location.href = '/login?project=risk-identifier&redirect=' + encodeURIComponent(window.location.pathname);
+        } else {
+          document.body.style.display = '';
+        }
+      } catch (e) {
+        document.body.style.display = ''; // fail open on network error
+      }
+    })();
+  </script>
 
   <header>
     <a class="logo" href="../index.html">Matt <span>Brown</span></a>
