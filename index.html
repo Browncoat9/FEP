@@ -3,83 +3,639 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fuzzy Elf Productions</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>SOW Analyzer — Matt Brown</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    .tool-wrapper {
+      max-width: 900px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+    }
+
+    .tool-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .tool-card h2 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.4rem;
+    }
+
+    .tool-card > p {
+      color: var(--muted);
+      font-size: 0.875rem;
+      margin-bottom: 1.25rem;
+      line-height: 1.6;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 200px;
+      padding: 0.9rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      color: var(--text);
+      resize: vertical;
+      transition: border-color 0.2s;
+      line-height: 1.6;
+    }
+
+    textarea::placeholder { color: var(--muted); }
+    textarea:focus { outline: none; border-color: var(--accent); }
+
+    .char-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+
+    .notice {
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .notice svg {
+      width: 13px;
+      height: 13px;
+      flex-shrink: 0;
+      opacity: 0.6;
+    }
+
+    #charCount {
+      font-size: 0.8rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 7px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 1.1rem;
+      transition: opacity 0.2s, transform 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .btn-secondary:hover { background: var(--accent); color: var(--bg); }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(13,13,20,0.4);
+      border-top-color: var(--bg);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading .spinner { display: block; }
+    .loading .btn-text { display: none; }
+
+    .error-msg {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #f87171;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+
+    /* Results */
+    #results { display: none; }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .results-header h2 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--white);
+      margin: 0;
+    }
+
+    .btn-group { display: flex; gap: 0.5rem; }
+
+    /* Summary */
+    .summary-text {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    /* Section labels */
+    .section-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    /* Tables */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.855rem;
+    }
+
+    .data-table th {
+      background: var(--surface);
+      color: var(--muted);
+      padding: 0.6rem 0.9rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-table td {
+      padding: 0.8rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.55;
+      color: var(--text);
+    }
+
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 0.18rem 0.55rem;
+      border-radius: 5px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .High   { background: rgba(239,68,68,0.15);  color: #f87171; }
+    .Medium { background: rgba(234,179,8,0.15);  color: #fbbf24; }
+    .Low    { background: rgba(34,197,94,0.15);  color: #4ade80; }
+
+    .type-badge {
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(6,182,212,0.2);
+      display: inline-block;
+      padding: 0.18rem 0.55rem;
+      border-radius: 5px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+
+    .id-cell {
+      font-weight: 700;
+      color: var(--white);
+      white-space: nowrap;
+    }
+
+    .empty-state {
+      color: var(--muted);
+      font-size: 0.875rem;
+      padding: 0.5rem 0;
+      font-style: italic;
+    }
+
+    @media (max-width: 640px) {
+      .data-table { font-size: 0.8rem; }
+      .data-table th, .data-table td { padding: 0.5rem 0.6rem; }
+    }
+  </style>
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 </head>
-<body>
+<body style="display:none">
+  <script>
+    (async function() {
+      try {
+        const res = await fetch('/api/auth?project=sow-analyzer');
+        const { authenticated } = await res.json();
+        if (!authenticated) {
+          window.location.href = '/login?project=sow-analyzer&redirect=' + encodeURIComponent(window.location.pathname);
+        } else {
+          document.body.style.display = '';
+        }
+      } catch (e) {
+        document.body.style.display = ''; // fail open on network error
+      }
+    })();
+  </script>
 
   <header>
-    <a class="logo" href="index.html">Matt <span>Brown</span></a>
+    <a class="logo" href="../index.html">Matt <span>Brown</span></a>
     <nav>
-      <a href="#projects">Projects</a>
-      <a href="#about">About</a>
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#about">About</a>
     </nav>
   </header>
 
-  <section class="hero">
-    <p class="eyebrow">Matt Brown</p>
-    <h1>AI <span>Experiments</span></h1>
-    <p>A place to post things I'm building and tinkering with. Mostly AI tools.</p>
-    <a href="#projects" class="btn">See what's here</a>
-    <a href="#about" class="btn-ghost">About</a>
-  </section>
-
-  <div class="section" id="projects">
-    <p class="section-label">Projects</p>
-    <h2>What's here</h2>
-    <p class="subtitle">Some things work, some are placeholders. Updated as I build.</p>
-    <div class="cards">
-
-      <a class="card" href="project-risk-identifier/index.html">
-        <div class="icon">⚠️</div>
-        <h3>Project Risk Identifier <span class="live-badge">Live</span></h3>
-        <p>Describe your project and get an AI-generated risk register with likelihood, impact, and mitigations — in seconds.</p>
-        <div class="arrow">Try it →</div>
-      </a>
-
-      <a class="card" href="ai-process-automation/index.html">
-        <div class="icon">🔧</div>
-        <h3>Experiment 2</h3>
-        <p>Coming soon.</p>
-        <div class="arrow">View →</div>
-      </a>
-
-      <a class="card" href="data-analytics-dashboard/index.html">
-        <div class="icon">🔧</div>
-        <h3>Experiment 3</h3>
-        <p>Coming soon.</p>
-        <div class="arrow">View →</div>
-      </a>
-
-      <a class="card" href="document-intelligence/index.html">
-        <div class="icon">🔧</div>
-        <h3>Experiment 4</h3>
-        <p>Coming soon.</p>
-        <div class="arrow">View →</div>
-      </a>
-
-      <a class="card" href="strategic-ai-advisory/index.html">
-        <div class="icon">🔧</div>
-        <h3>Experiment 5</h3>
-        <p>Coming soon.</p>
-        <div class="arrow">View →</div>
-      </a>
-
-    </div>
+  <div class="project-hero">
+    <a class="back" href="../index.html">← Back to projects</a>
+    <h1>📋 SOW Analyzer</h1>
+    <p>Paste a Statement of Work or contract and get a plain-English breakdown — deliverables, dates, obligations, and red flags.</p>
   </div>
 
-  <div class="section" id="about">
-    <p class="section-label">About</p>
-    <h2>About</h2>
-    <p class="subtitle">A sandbox for AI experiments. Some things work, some are in progress.</p>
+  <div class="tool-wrapper">
+
+    <div class="tool-card">
+      <h2>Paste your document</h2>
+      <p>Copy and paste the full text of your SOW or contract below. The more complete the text, the better the analysis. <strong style="color:var(--white)">Don't paste documents that are truly confidential</strong> without checking your company's policy on using AI tools with sensitive information.</p>
+
+      <textarea
+        id="sowText"
+        maxlength="15000"
+        placeholder="Paste your Statement of Work or contract text here...&#10;&#10;Tip: Ctrl+A in your document, Ctrl+C, then paste here. Tables and formatting are fine — the AI will handle it."
+      ></textarea>
+
+      <div class="char-row">
+        <span class="notice">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8 7v5M8 5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          Up to 15,000 characters (~10 pages)
+        </span>
+        <span id="charCount">0 / 15,000</span>
+      </div>
+
+      <button class="btn-primary" id="analyzeBtn" onclick="analyzeSow()">
+        <div class="spinner" id="spinner"></div>
+        <span class="btn-text">Analyze Document</span>
+      </button>
+    </div>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <div id="results">
+
+      <!-- Summary -->
+      <div class="tool-card">
+        <p class="section-title">Summary</p>
+        <p class="summary-text" id="summaryText"></p>
+      </div>
+
+      <!-- Deliverables -->
+      <div class="tool-card">
+        <div class="results-header">
+          <h2>Deliverables</h2>
+          <div class="btn-group">
+            <button class="btn-secondary" onclick="downloadCSV('deliverables')">Download CSV</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="data-table" id="deliverablesTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Deliverable</th>
+                <th>Due Date</th>
+                <th>Owner</th>
+                <th>Acceptance Criteria</th>
+              </tr>
+            </thead>
+            <tbody id="deliverablesBody"></tbody>
+          </table>
+        </div>
+        <p class="empty-state" id="deliverablesEmpty" style="display:none">No deliverables found in this document.</p>
+      </div>
+
+      <!-- Key Dates -->
+      <div class="tool-card">
+        <div class="results-header">
+          <h2>Key Dates &amp; Milestones</h2>
+          <button class="btn-secondary" onclick="downloadCSV('dates')">Download CSV</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="data-table" id="datesTable">
+            <thead>
+              <tr>
+                <th>Date / Timeframe</th>
+                <th>Event</th>
+                <th>Type</th>
+              </tr>
+            </thead>
+            <tbody id="datesBody"></tbody>
+          </table>
+        </div>
+        <p class="empty-state" id="datesEmpty" style="display:none">No key dates found in this document.</p>
+      </div>
+
+      <!-- Client Obligations -->
+      <div class="tool-card">
+        <h2 style="margin-bottom:1rem;">Client Obligations</h2>
+        <div style="overflow-x:auto;">
+          <table class="data-table" id="obligationsTable">
+            <thead>
+              <tr>
+                <th>What the Client Must Provide or Do</th>
+                <th style="width:180px;">Deadline</th>
+              </tr>
+            </thead>
+            <tbody id="obligationsBody"></tbody>
+          </table>
+        </div>
+        <p class="empty-state" id="obligationsEmpty" style="display:none">No explicit client obligations found.</p>
+      </div>
+
+      <!-- Payment Milestones -->
+      <div class="tool-card">
+        <h2 style="margin-bottom:1rem;">Payment Milestones</h2>
+        <div style="overflow-x:auto;">
+          <table class="data-table" id="paymentTable">
+            <thead>
+              <tr>
+                <th>Trigger</th>
+                <th style="width:140px;">Amount</th>
+                <th style="width:160px;">Due</th>
+              </tr>
+            </thead>
+            <tbody id="paymentBody"></tbody>
+          </table>
+        </div>
+        <p class="empty-state" id="paymentEmpty" style="display:none">No payment milestones found.</p>
+      </div>
+
+      <!-- Red Flags -->
+      <div class="tool-card">
+        <h2 style="margin-bottom:1rem;">Red Flags</h2>
+        <div style="overflow-x:auto;">
+          <table class="data-table" id="flagsTable">
+            <thead>
+              <tr>
+                <th>Issue</th>
+                <th style="width:90px;">Severity</th>
+                <th>Recommendation</th>
+              </tr>
+            </thead>
+            <tbody id="flagsBody"></tbody>
+          </table>
+        </div>
+        <p class="empty-state" id="flagsEmpty" style="display:none">No red flags identified.</p>
+      </div>
+
+    </div><!-- /#results -->
+
   </div>
 
   <footer>
-    &copy; 2026 Matt Brown &mdash; <a href="https://fuzzyelfproductions.com">fuzzyelfproductions.com</a>
+    &copy; 2026 Matt Brown &mdash; <a href="../index.html">fuzzyelfproductions.com</a>
   </footer>
+
+  <script>
+    let currentResult = null;
+
+    function escapeHtml(str) {
+      if (str == null) return '';
+      const div = document.createElement('div');
+      div.textContent = String(str);
+      return div.innerHTML;
+    }
+
+    function safeSeverity(val) {
+      return ['High', 'Medium', 'Low'].includes(val) ? val : 'Low';
+    }
+
+    function safeType(val) {
+      const allowed = ['deadline', 'milestone', 'payment', 'review', 'start', 'end'];
+      return allowed.includes(String(val).toLowerCase()) ? String(val).toLowerCase() : 'milestone';
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('errorMsg');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    async function analyzeSow() {
+      const text = document.getElementById('sowText').value.trim();
+      const btn = document.getElementById('analyzeBtn');
+      const errorMsg = document.getElementById('errorMsg');
+      const results = document.getElementById('results');
+
+      if (text.length < 50) {
+        showError('Please paste more of the document before analyzing.');
+        return;
+      }
+
+      errorMsg.style.display = 'none';
+      results.style.display = 'none';
+      btn.disabled = true;
+      btn.classList.add('loading');
+
+      try {
+        const response = await fetch('/api/sow', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Something went wrong.');
+        }
+
+        currentResult = data.result;
+        renderResults(data.result);
+        results.style.display = 'block';
+        results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      } catch (err) {
+        showError(err.message || 'Unable to analyze document. Please try again.');
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+      }
+    }
+
+    function renderResults(r) {
+      // Summary
+      document.getElementById('summaryText').textContent = r.summary || 'No summary available.';
+
+      // Deliverables
+      const dBody = document.getElementById('deliverablesBody');
+      const dEmpty = document.getElementById('deliverablesEmpty');
+      const dTable = document.getElementById('deliverablesTable');
+      if (r.deliverables && r.deliverables.length) {
+        dBody.innerHTML = r.deliverables.map(d => `
+          <tr>
+            <td class="id-cell">${escapeHtml(d.id)}</td>
+            <td><strong style="color:var(--white)">${escapeHtml(d.title)}</strong><br><span style="color:var(--muted);font-size:0.82rem;">${escapeHtml(d.description)}</span></td>
+            <td style="white-space:nowrap">${escapeHtml(d.dueDate)}</td>
+            <td>${escapeHtml(d.owner)}</td>
+            <td style="color:var(--muted)">${escapeHtml(d.acceptanceCriteria)}</td>
+          </tr>`).join('');
+        dTable.style.display = '';
+        dEmpty.style.display = 'none';
+      } else {
+        dTable.style.display = 'none';
+        dEmpty.style.display = '';
+      }
+
+      // Key Dates
+      const dtBody = document.getElementById('datesBody');
+      const dtEmpty = document.getElementById('datesEmpty');
+      const dtTable = document.getElementById('datesTable');
+      if (r.keyDates && r.keyDates.length) {
+        dtBody.innerHTML = r.keyDates.map(d => `
+          <tr>
+            <td style="white-space:nowrap;font-weight:600;color:var(--white)">${escapeHtml(d.date)}</td>
+            <td>${escapeHtml(d.event)}</td>
+            <td><span class="type-badge">${escapeHtml(safeType(d.type))}</span></td>
+          </tr>`).join('');
+        dtTable.style.display = '';
+        dtEmpty.style.display = 'none';
+      } else {
+        dtTable.style.display = 'none';
+        dtEmpty.style.display = '';
+      }
+
+      // Client Obligations
+      const obBody = document.getElementById('obligationsBody');
+      const obEmpty = document.getElementById('obligationsEmpty');
+      const obTable = document.getElementById('obligationsTable');
+      if (r.clientObligations && r.clientObligations.length) {
+        obBody.innerHTML = r.clientObligations.map(o => `
+          <tr>
+            <td>${escapeHtml(o.obligation)}</td>
+            <td style="color:var(--muted)">${escapeHtml(o.deadline)}</td>
+          </tr>`).join('');
+        obTable.style.display = '';
+        obEmpty.style.display = 'none';
+      } else {
+        obTable.style.display = 'none';
+        obEmpty.style.display = '';
+      }
+
+      // Payment Milestones
+      const pmBody = document.getElementById('paymentBody');
+      const pmEmpty = document.getElementById('paymentEmpty');
+      const pmTable = document.getElementById('paymentTable');
+      if (r.paymentMilestones && r.paymentMilestones.length) {
+        pmBody.innerHTML = r.paymentMilestones.map(p => `
+          <tr>
+            <td>${escapeHtml(p.milestone)}</td>
+            <td style="font-weight:600;color:var(--white)">${escapeHtml(p.amount)}</td>
+            <td style="color:var(--muted)">${escapeHtml(p.dueDate)}</td>
+          </tr>`).join('');
+        pmTable.style.display = '';
+        pmEmpty.style.display = 'none';
+      } else {
+        pmTable.style.display = 'none';
+        pmEmpty.style.display = '';
+      }
+
+      // Red Flags
+      const rfBody = document.getElementById('flagsBody');
+      const rfEmpty = document.getElementById('flagsEmpty');
+      const rfTable = document.getElementById('flagsTable');
+      if (r.redFlags && r.redFlags.length) {
+        rfBody.innerHTML = r.redFlags.map(f => {
+          const sev = safeSeverity(f.severity);
+          return `
+          <tr>
+            <td>${escapeHtml(f.flag)}</td>
+            <td><span class="badge ${sev}">${escapeHtml(sev)}</span></td>
+            <td style="color:var(--muted)">${escapeHtml(f.recommendation)}</td>
+          </tr>`;
+        }).join('');
+        rfTable.style.display = '';
+        rfEmpty.style.display = 'none';
+      } else {
+        rfTable.style.display = 'none';
+        rfEmpty.style.display = '';
+      }
+    }
+
+    function downloadCSV(section) {
+      if (!currentResult) return;
+      let headers, rows;
+
+      if (section === 'deliverables') {
+        headers = ['ID', 'Title', 'Description', 'Due Date', 'Owner', 'Acceptance Criteria'];
+        rows = (currentResult.deliverables || []).map(d =>
+          [d.id, d.title, d.description, d.dueDate, d.owner, d.acceptanceCriteria]
+        );
+      } else if (section === 'dates') {
+        headers = ['Date', 'Event', 'Type'];
+        rows = (currentResult.keyDates || []).map(d => [d.date, d.event, d.type]);
+      }
+
+      const csvRows = rows.map(r => r.map(v => `"${String(v || '').replace(/"/g, '""')}"`).join(','));
+      const csv = [headers.join(','), ...csvRows].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sow-${section}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Character counter
+    const textarea = document.getElementById('sowText');
+    const charCount = document.getElementById('charCount');
+
+    textarea.addEventListener('input', () => {
+      const len = textarea.value.length;
+      const max = 15000;
+      charCount.textContent = `${len.toLocaleString()} / ${max.toLocaleString()}`;
+      charCount.style.color = len > 13500 ? '#f87171' : 'var(--muted)';
+    });
+
+    textarea.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) analyzeSow();
+    });
+  </script>
 
 </body>
 </html>
