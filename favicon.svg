@@ -1,22 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="512" height="512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -12 124 124" width="1024" height="1024" preserveAspectRatio="xMidYMid meet">
 <defs>
-<radialGradient id="gm" cx="50%" cy="44%" r="62%"><stop offset="0" stop-color="#fff7cf"></stop><stop offset="0.42" stop-color="#ffd21f"></stop><stop offset="1" stop-color="#f0900a"></stop></radialGradient>
+<radialGradient id="halo" cx="50%" cy="48%" r="58%">
+<stop offset="0" stop-color="#ff85c5" stop-opacity="0.95"></stop>
+<stop offset="0.24" stop-color="#ff2d9b" stop-opacity="0.9"></stop>
+<stop offset="0.46" stop-color="#ff2d9b" stop-opacity="0.47"></stop>
+<stop offset="0.7" stop-color="#ff2d9b" stop-opacity="0"></stop>
+</radialGradient>
+<linearGradient id="sg" x1="0.3" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#2f172a"></stop><stop offset="0.5" stop-color="#190c16"></stop><stop offset="1" stop-color="#050209"></stop>
+</linearGradient>
+<filter id="goo" x="-45%" y="-45%" width="190%" height="190%" color-interpolation-filters="sRGB">
+<feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur"></feGaussianBlur>
+<feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 15 -5" result="goo"></feColorMatrix>
+<feTurbulence type="fractalNoise" baseFrequency="0.034 0.05" numOctaves="2" seed="7" result="noise"></feTurbulence>
+<feDisplacementMap in="goo" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G" result="disp"></feDisplacementMap>
+<feGaussianBlur in="disp" stdDeviation="0.5"></feGaussianBlur>
+</filter>
+<filter id="dgoo" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB">
+<feGaussianBlur in="SourceGraphic" stdDeviation="0.7" result="b"></feGaussianBlur>
+<feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -7" result="g"></feColorMatrix>
+<feTurbulence type="fractalNoise" baseFrequency="0.12" numOctaves="2" seed="10" result="n"></feTurbulence>
+<feDisplacementMap in="g" in2="n" scale="3.5"></feDisplacementMap>
+</filter>
 </defs>
-<path d="M50,1 L60.4,11.4 L74.5,7.6 L78.3,21.7 L92.4,25.5 L88.6,39.7 L99,50 L88.6,60.4 L92.4,74.5 L78.3,78.3 L74.5,92.4 L60.4,88.6 L50,99 L39.7,88.6 L25.5,92.4 L21.7,78.3 L7.6,74.5 L11.4,60.4 L1,50 L11.4,39.7 L7.6,25.5 L21.7,21.7 L25.5,7.6 L39.7,11.4 Z" fill="url(#gm)"></path>
-<g stroke="#0b1130" stroke-width="2.1" stroke-linejoin="round" stroke-linecap="round">
-<path d="M59,69 C71,77 83,73 85,62 C86,55 81,52 78,55 C81,57 81,61 79,64 C75,69 67,70 60,65 Z" fill="#2b5fd6"></path><path d="M80,48 L89,55 L80,56 L84,60 L75,57 Z" fill="#2b5fd6"></path>
-<path d="M41,43 C30,38 24,28 19,16 C26,24 31,26 35,27 C38,32 41,38 41,43 Z" fill="#2b5fd6"></path>
-<path d="M59,43 C70,38 76,28 81,16 C74,24 69,26 65,27 C62,32 59,38 59,43 Z" fill="#2b5fd6"></path>
-<path d="M37,40 C31,33 28,28 26,23 C30,27 33,28 36,30 Z" fill="#1b3ea0" stroke="none"></path>
-<path d="M63,40 C69,33 72,28 74,23 C70,27 67,28 64,30 Z" fill="#1b3ea0" stroke="none"></path>
-<path d="M28,52 C28,39 38,35 50,35 C62,35 72,39 72,52 C72,64 62,70 50,74 C38,70 28,64 28,52 Z" fill="#2b5fd6"></path>
-<path d="M30,50 L32,39 L37,47 L41,36 L45,46 L50,34 L55,46 L59,36 L63,47 L68,39 L70,50 C63,45 56,44 50,44 C44,44 37,45 30,50 Z" fill="#0f1738"></path>
-<path d="M35,55 Q41,49 48,54 Q42,60 35,55 Z" fill="#fff" stroke-width="1.6"></path>
-<path d="M65,55 Q59,49 52,54 Q58,60 65,55 Z" fill="#fff" stroke-width="1.6"></path>
-<circle cx="44" cy="55" r="2.7" fill="#ffd21f" stroke="none"></circle><circle cx="56" cy="55" r="2.7" fill="#ffd21f" stroke="none"></circle>
-<circle cx="44.5" cy="55.2" r="1.4" fill="#0b1130" stroke="none"></circle><circle cx="55.5" cy="55.2" r="1.4" fill="#0b1130" stroke="none"></circle>
-<path d="M48,60 Q50,62.5 52,60 Q50,61.5 48,60 Z" fill="#1b3ea0" stroke="none"></path>
-<path d="M38,63 Q50,67 62,63 Q58,72 50,73 Q42,72 38,63 Z" fill="#2a0f3a" stroke-width="1.8"></path>
-<path d="M39,64 Q50,67.5 61,64 L60,67 Q50,70 40,67 Z" fill="#fff" stroke="none"></path>
-<path d="M41,66 L43.6,66 L42.3,71 Z" fill="#fff" stroke="none"></path><path d="M59,66 L56.4,66 L57.7,71 Z" fill="#fff" stroke="none"></path>
-</g></svg>
+<rect x="-12" y="-12" width="124" height="124" fill="url(#halo)"></rect>
+<g filter="url(#goo)" fill="url(#sg)"><circle cx="50" cy="54" r="18"></circle><circle cx="50" cy="46" r="14"></circle><circle cx="50" cy="34" r="13.5"></circle><circle cx="35" cy="46" r="13"></circle><circle cx="65" cy="47" r="14"></circle><circle cx="28" cy="57" r="11.5"></circle><circle cx="72" cy="57" r="11.5"></circle><circle cx="40" cy="66" r="13"></circle><circle cx="60" cy="67" r="13"></circle><circle cx="50" cy="69" r="12"></circle><circle cx="38" cy="36" r="9.5"></circle><circle cx="62" cy="36" r="9.5"></circle><circle cx="31" cy="40" r="7.5"></circle><circle cx="69" cy="40" r="7.5"></circle><circle cx="24" cy="50" r="7.5"></circle><circle cx="76" cy="50" r="7.5"></circle><circle cx="33" cy="64" r="8.5"></circle><circle cx="67" cy="65" r="8.5"></circle><circle cx="44" cy="72" r="8.5"></circle><circle cx="57" cy="73" r="8.5"></circle><circle cx="50" cy="26" r="7.5"></circle><circle cx="42" cy="30" r="6.5"></circle><circle cx="58" cy="30" r="6.5"></circle><circle cx="44" cy="58" r="9"></circle><circle cx="56" cy="58" r="9"></circle></g>
+<g filter="url(#dgoo)" fill="#050209"><circle cx="15" cy="23" r="3.4"></circle><circle cx="85" cy="21" r="4"></circle><circle cx="90" cy="48" r="2.4"></circle><circle cx="83" cy="79" r="3.6"></circle><circle cx="61" cy="86" r="2.4"></circle><circle cx="33" cy="85" r="3.2"></circle><circle cx="12" cy="59" r="2.8"></circle><circle cx="21" cy="81" r="2"></circle><circle cx="50" cy="11" r="2.4"></circle><circle cx="92" cy="34" r="2"></circle><circle cx="8" cy="39" r="2"></circle><circle cx="74" cy="91" r="1.7"></circle><circle cx="27" cy="15" r="1.8"></circle><circle cx="70" cy="15" r="1.6"></circle></g>
+</svg>
